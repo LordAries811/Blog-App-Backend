@@ -1,5 +1,7 @@
 const BlogModel = require("../models/Blogs");
+const User = require("../models/Users");
 const express = require("express");
+const mongoose = require("mongoose");
 
 const getAllBlogs = async (req, res) => {
     let blogs;
@@ -17,9 +19,26 @@ const getAllBlogs = async (req, res) => {
 
 const addBlog = async (req, res) => {
     const { title, description, image, user } = req.body;
+    let existingUser;
+    try {
+        existingUser = await User.findById(user);
+    } catch (e) {
+        return console.log(e);
+    }
+    
+    if(!existingUser){
+        return res.status(400).json({ message: "Sorry, You are not an existing user" });
+    }
+
     const blog = new BlogModel({ title, description, image, user });
     try {
-        await blog.save();
+        //await blog.save();
+        const session = await mongoose.startSession();
+        session.startTransaction();
+        await blog.save({session});
+        existingUser.blogs.push(blog);
+        await existingUser.save({session});
+        await session.commitTransaction();
     } catch (e) {
         return console.log(e);
     }
@@ -56,7 +75,9 @@ const deleteById = async (req, res) => {
     const id = req.params.id;
     let blog;
     try {
-        blog = await BlogModel.findByIdAndDelete(id);
+        blog = await BlogModel.findByIdAndDelete(id).populate("user");
+        await blog.user.blogs.pull(blog);
+        await blog.user.save();
     } catch (e) {
         return console.log(e);
     }

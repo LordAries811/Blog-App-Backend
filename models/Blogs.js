@@ -1,27 +1,3 @@
-// const mongoose = require("mongoose");
-// const schema = mongoose.Schema;
-
-// const blogSchema = new schema({
-//     title: {
-//         type: String,
-//         required: true
-//     },
-//     description: {
-//         type: String,
-//         required: true
-//     },
-//     image: {
-//         type: String,
-//         required: true
-//     },
-//     user: {
-//         type: String,
-//         required: true
-//     }
-// });
-
-// module.exports = blogSchema;
-
 const mongoose = require("mongoose");
 const schema = mongoose.Schema;
 
@@ -39,8 +15,9 @@ const blogSchema = new schema({
         required: true
     },
     user: {
-        type: String,
-        required: true
+        type: mongoose.Types.ObjectId,
+        ref: "Users",
+        required: true,
     }
 });
 

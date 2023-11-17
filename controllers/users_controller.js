@@ -35,7 +35,7 @@ const signup = async(req,res) => {
     const saltRounds = 10;
     const salt = bcrypt.genSaltSync(saltRounds);
     const hashedpwd = bcrypt.hashSync(password,salt);
-    const user = new User({name, email, password: hashedpwd});
+    const user = new User({name, email, password: hashedpwd,blogs:[]});
     try{
         await user.save();// mongoose library provides save() to db
     } catch(e){
